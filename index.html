@@ -230,6 +230,73 @@
   .contact-value a:hover {
     color: #baffcf;
   }
+
+  .citater-form {
+    margin: 25px 0 20px;
+    padding: 20px;
+    background: rgba(20, 90, 55, 0.35);
+    border: 1px solid #2f8f5b;
+    border-radius: 8px;
+  }
+
+  .citater-form textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 14px;
+    border: 1px solid #3ddc84;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #06301c;
+    font: inherit;
+    resize: vertical;
+  }
+
+  .citater-form button {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #3ddc84;
+    color: #06301c;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .citater-form button:hover {
+    background: #7dffb0;
+  }
+
+  .citater-note {
+    font-size: 0.95em;
+    color: #a9e8bf;
+    margin-bottom: 12px;
+  }
+
+  .citater-list {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .citater-entry {
+    padding: 14px 16px;
+    background: rgba(20, 90, 55, 0.35);
+    border: 1px solid #2f8f5b;
+    border-radius: 8px;
+  }
+
+  .citater-entry strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #ecffef;
+  }
+
+  .citater-time {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #8fe0ac;
+  }
 </style>
 </head>
 <body>
@@ -237,36 +304,41 @@
 <div class="topbar">
   <button class="menu-toggle" onclick="toggleMenu()">menu ▾</button>
   <nav id="mainNav">
-    <a href="#" onclick="showPage('page1'); return false;">home</a>
-    <a href="#" onclick="showPage('page2'); return false;">about</a>
-    <a href="#" onclick="showPage('page3'); return false;">work</a>
-    <a href="#" onclick="showPage('page4'); return false;">contact</a>
+    <a href="#" onclick="showPage('page1'); return false;">Madklub</a>
+    <a href="#" onclick="showPage('page2'); return false;">Galleri?</a>
+    <a href="#" onclick="showPage('page3'); return false;">Citater</a>
+   
   </nav>
   <div class="signature">3. Sal HVK</div>
 </div>
 
 <div class="container">
   <div id="page1" class="page active">
-    <h1>Home</h1>
+    <h1> Madklub </h1>
     <p> Heyo</p>
     </div>
 
   <div id="page2" class="page">
-    <h1>About</h1>
-    <p>Jordan Everly is an example illustrator based in Sample City.
+    <h1>Galleri?</h1>
+    <p>
 
      </p>
   </div>
 
   <div id="page3" class="page">
-    <h1>Work</h1>
-    <p>This section will showcase a gallery of placeholder projects, coming soon.</p>
+    <h1>Citater</h1>
+    <p>Del en kort note her. Alle med linket kan skrive og se de tidligere indlæg, og hver note får dato og tidspunkt.</p>
+
+    <form id="citaterForm" class="citater-form">
+      <div class="citater-note">Indlæg gemmes i dette link, så alle med URL'en kan se og tilføje noter.</div>
+      <textarea id="citaterInput" placeholder="Skriv din note her..." required></textarea>
+      <button type="submit">Gem note</button>
+    </form>
+
+    <ul id="citaterEntries" class="citater-list"></ul>
   </div>
 
-  <div id="page4" class="page">
-    <h1>Contact</h1>
-    <p>Instagram: @example.handle</p>
-  </div>
+  
 </div>
 
 <script>
@@ -276,9 +348,96 @@
     document.getElementById('mainNav').classList.remove('open');
   }
 
-    function toggleMenu() {
+  function toggleMenu() {
     document.getElementById('mainNav').classList.toggle('open');
   }
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function getEntries() {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('entries');
+
+    if (encoded) {
+      try {
+        return JSON.parse(decodeURIComponent(encoded));
+      } catch (error) {
+        console.warn('Could not parse entries from URL', error);
+      }
+    }
+
+    try {
+      const stored = localStorage.getItem('citaterEntries');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.warn('Could not read stored entries', error);
+      return [];
+    }
+  }
+
+  function saveEntries(entries) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('entries', encodeURIComponent(JSON.stringify(entries)));
+    const newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+    history.replaceState(null, '', newUrl);
+
+    try {
+      localStorage.setItem('citaterEntries', JSON.stringify(entries));
+    } catch (error) {
+      console.warn('Could not save entries locally', error);
+    }
+  }
+
+  function renderEntries() {
+    const entries = getEntries();
+    const list = document.getElementById('citaterEntries');
+
+    if (!entries.length) {
+      list.innerHTML = '<li class="citater-entry">Ingen noter endnu.</li>';
+      return;
+    }
+
+    list.innerHTML = entries.map(entry => `
+      <li class="citater-entry">
+        <strong>${escapeHtml(entry.text)}</strong>
+        <span class="citater-time">${escapeHtml(entry.time)}</span>
+      </li>
+    `).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('citaterForm');
+    const input = document.getElementById('citaterInput');
+
+    renderEntries();
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+
+      if (!text) {
+        return;
+      }
+
+      const entries = getEntries();
+      const timestamp = new Date().toLocaleString('da-DK', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+
+      entries.unshift({ text, time: timestamp });
+      saveEntries(entries);
+      renderEntries();
+      input.value = '';
+    });
+  });
 </script>
 
 </body>
