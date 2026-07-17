@@ -297,6 +297,163 @@
     font-size: 0.9em;
     color: #8fe0ac;
   }
+
+  .madklub-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .madklub-controls select,
+  .madklub-controls button {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #3ddc84;
+    background: rgba(255, 255, 255, 0.95);
+    color: #06301c;
+    font: inherit;
+  }
+
+  .madklub-controls button {
+    background: #3ddc84;
+    color: #06301c;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .madklub-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .madklub-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+  }
+
+  .madklub-table th,
+  .madklub-table td {
+    border: 1px solid #2f8f5b;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .madklub-table th {
+    background: rgba(20, 90, 55, 0.5);
+    color: #ecffef;
+  }
+
+  .madklub-table td:first-child {
+    text-align: left;
+    min-width: 180px;
+  }
+
+  .madklub-table input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #3ddc84;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #06301c;
+    font: inherit;
+  }
+
+  .madklub-total-row td {
+    background: rgba(20, 90, 55, 0.45);
+    font-weight: 700;
+    color: #ecffef;
+  }
+
+  .calendar-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+
+  .calendar-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #ecffef;
+    font-size: 0.95em;
+  }
+
+  .calendar-controls input,
+  .calendar-controls select,
+  .calendar-controls button {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #3ddc84;
+    background: rgba(255, 255, 255, 0.95);
+    color: #06301c;
+    font: inherit;
+  }
+
+  .calendar-controls button {
+    background: #3ddc84;
+    color: #06301c;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .calendar-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .calendar-event {
+    padding: 16px;
+    background: rgba(20, 90, 55, 0.35);
+    border: 1px solid #2f8f5b;
+    border-radius: 8px;
+  }
+
+  .calendar-event h3 {
+    margin-bottom: 8px;
+    color: #ecffef;
+  }
+
+  .calendar-event p {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+  }
+
+  .calendar-attendees {
+    margin-top: 8px;
+    color: #a9e8bf;
+    font-size: 0.95em;
+  }
+
+  .calendar-signup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .calendar-signup input {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #3ddc84;
+    background: rgba(255, 255, 255, 0.95);
+    color: #06301c;
+  }
+
+  .calendar-signup button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #7dffb0;
+    color: #06301c;
+    cursor: pointer;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -307,16 +464,27 @@
     <a href="#" onclick="showPage('page1'); return false;">Madklub</a>
     <a href="#" onclick="showPage('page2'); return false;">Galleri?</a>
     <a href="#" onclick="showPage('page3'); return false;">Citater</a>
-   
+    <a href="#" onclick="showPage('page4'); return false;">Kalender</a>
   </nav>
   <div class="signature">3. Sal HVK</div>
 </div>
 
 <div class="container">
   <div id="page1" class="page active">
-    <h1> Madklub </h1>
-    <p> Heyo</p>
+    <h1>Madklub</h1>
+    <p>Her kan I holde styr på madbidrag. Hver kolonne er en dato, hver række er en person, og summen for hver dato vises i bunden.</p>
+
+    <div class="madklub-controls">
+      <label for="madklubMonth">Måned:</label>
+      <select id="madklubMonth"></select>
+      <button id="addPersonBtn" type="button">Tilføj person</button>
+      <button id="addDateBtn" type="button">Tilføj dato</button>
     </div>
+
+    <div class="madklub-table-wrapper">
+      <table id="madklubTable" class="madklub-table"></table>
+    </div>
+  </div>
 
   <div id="page2" class="page">
     <h1>Galleri?</h1>
@@ -338,6 +506,32 @@
     <ul id="citaterEntries" class="citater-list"></ul>
   </div>
 
+  <div id="page4" class="page">
+    <h1>Kalender</h1>
+    <p>Her kan I oprette fælles begivenheder for måneden, og alle med linket kan tilmelde sig.</p>
+
+    <div class="calendar-controls">
+      <label>
+        Måned
+        <select id="calendarMonthSelect"></select>
+      </label>
+      <label>
+        Titel
+        <input id="calendarTitleInput" placeholder="Begivenhedens titel" required>
+      </label>
+      <label>
+        Dato
+        <input id="calendarDateInput" type="date" required>
+      </label>
+      <label>
+        Beskrivelse
+        <input id="calendarDescriptionInput" placeholder="Kort beskrivelse">
+      </label>
+      <button id="calendarAddBtn" type="button">Gem begivenhed</button>
+    </div>
+
+    <div id="calendarEvents" class="calendar-list"></div>
+  </div>
   
 </div>
 
@@ -353,7 +547,7 @@
   }
 
   function escapeHtml(text) {
-    return text
+    return String(text ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -412,11 +606,215 @@
     `).join('');
   }
 
+  function getMonthNames() {
+    return ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
+  }
+
+  function formatDateLabel(dayNumber, monthName) {
+    const monthNames = getMonthNames();
+    const monthIndex = monthNames.indexOf(monthName);
+    const monthPart = monthIndex >= 0 ? String(monthIndex + 1).padStart(2, '0') : '01';
+    const year = new Date().getFullYear();
+    const weekday = new Date(year, monthIndex >= 0 ? monthIndex : new Date().getMonth(), dayNumber).toLocaleDateString('da-DK', { weekday: 'short' });
+    return `${String(dayNumber).padStart(2, '0')}.${monthPart} (${weekday})`;
+  }
+
+  function createDefaultMadklubState() {
+    const monthName = getMonthNames()[new Date().getMonth()] || 'Juli';
+    return {
+      month: monthName,
+      people: [{ name: '', values: ['', '', '', ''] }],
+      dates: [
+        { label: formatDateLabel(1, monthName) },
+        { label: formatDateLabel(2, monthName) },
+        { label: formatDateLabel(3, monthName) },
+        { label: formatDateLabel(4, monthName) }
+      ]
+    };
+  }
+
+  function getMadklubState() {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('madklub');
+
+    if (encoded) {
+      try {
+        return JSON.parse(decodeURIComponent(encoded));
+      } catch (error) {
+        console.warn('Could not parse madklub state from URL', error);
+      }
+    }
+
+    try {
+      const stored = localStorage.getItem('madklubState');
+      return stored ? JSON.parse(stored) : createDefaultMadklubState();
+    } catch (error) {
+      console.warn('Could not read madklub state', error);
+      return createDefaultMadklubState();
+    }
+  }
+
+  function saveMadklubState(state) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('madklub', encodeURIComponent(JSON.stringify(state)));
+    const newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+    history.replaceState(null, '', newUrl);
+
+    try {
+      localStorage.setItem('madklubState', JSON.stringify(state));
+    } catch (error) {
+      console.warn('Could not save madklub state locally', error);
+    }
+  }
+
+  function renderMadklubTable() {
+    const state = getMadklubState();
+    const monthSelect = document.getElementById('madklubMonth');
+
+    if (monthSelect) {
+      monthSelect.innerHTML = getMonthNames().map(month => `<option value="${month}" ${month === state.month ? 'selected' : ''}>${month}</option>`).join('');
+    }
+
+    const table = document.getElementById('madklubTable');
+    if (!table) {
+      return;
+    }
+
+    const header = ['<thead><tr><th>Navn</th>', ...state.dates.map(date => `<th>${escapeHtml(date.label)}</th>`), '</tr></thead>'].join('');
+
+    const rows = state.people.map((person, rowIndex) => {
+      const values = person.values || [];
+      return `
+        <tr>
+          <td><input class="madklub-name-input" data-row-index="${rowIndex}" value="${escapeHtml(person.name)}" placeholder="Navn"></td>
+          ${state.dates.map((date, dateIndex) => `
+            <td><input class="madklub-value-input" type="number" step="any" inputmode="decimal" data-row-index="${rowIndex}" data-date-index="${dateIndex}" value="${escapeHtml(values[dateIndex] ?? '')}" placeholder="0"></td>
+          `).join('')}
+        </tr>
+      `;
+    }).join('');
+
+    const totals = state.dates.map((date, dateIndex) => {
+      const sum = state.people.reduce((total, person) => {
+        const raw = person.values?.[dateIndex] ?? '';
+        const numericValue = Number(raw);
+        return total + (Number.isFinite(numericValue) ? numericValue : 0);
+      }, 0);
+      return `<td>${sum}</td>`;
+    }).join('');
+
+    table.innerHTML = `${header}<tbody>${rows}<tr class="madklub-total-row"><td>I alt</td>${totals}</tr></tbody>`;
+  }
+
+  function updateMadklubFromInput(target) {
+    const state = getMadklubState();
+    const rowIndex = Number(target.dataset.rowIndex);
+    const dateIndex = target.dataset.dateIndex;
+
+    if (target.classList.contains('madklub-name-input')) {
+      state.people[rowIndex].name = target.value;
+    } else if (target.classList.contains('madklub-value-input')) {
+      const values = state.people[rowIndex].values || [];
+      values[Number(dateIndex)] = target.value;
+      state.people[rowIndex].values = values;
+    }
+
+    saveMadklubState(state);
+    renderMadklubTable();
+  }
+
+  function createDefaultCalendarState() {
+    return {
+      month: getMonthNames()[new Date().getMonth()] || 'Juli',
+      events: []
+    };
+  }
+
+  function getCalendarState() {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('calendar');
+
+    if (encoded) {
+      try {
+        return JSON.parse(decodeURIComponent(encoded));
+      } catch (error) {
+        console.warn('Could not parse calendar state from URL', error);
+      }
+    }
+
+    try {
+      const stored = localStorage.getItem('calendarState');
+      return stored ? JSON.parse(stored) : createDefaultCalendarState();
+    } catch (error) {
+      console.warn('Could not read calendar state', error);
+      return createDefaultCalendarState();
+    }
+  }
+
+  function saveCalendarState(state) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('calendar', encodeURIComponent(JSON.stringify(state)));
+    const newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+    history.replaceState(null, '', newUrl);
+
+    try {
+      localStorage.setItem('calendarState', JSON.stringify(state));
+    } catch (error) {
+      console.warn('Could not save calendar state locally', error);
+    }
+  }
+
+  function renderCalendarEvents() {
+    const state = getCalendarState();
+    const monthSelect = document.getElementById('calendarMonthSelect');
+
+    if (monthSelect) {
+      monthSelect.innerHTML = getMonthNames().map(month => `<option value="${month}" ${month === state.month ? 'selected' : ''}>${month}</option>`).join('');
+    }
+
+    const container = document.getElementById('calendarEvents');
+    if (!container) {
+      return;
+    }
+
+    const filteredEvents = (state.events || []).filter(event => event.month === state.month);
+
+    if (!filteredEvents.length) {
+      container.innerHTML = '<div class="calendar-event"><p>Ingen begivenheder i denne måned endnu.</p></div>';
+      return;
+    }
+
+    container.innerHTML = filteredEvents.map(event => `
+      <div class="calendar-event">
+        <h3>${escapeHtml(event.title)}</h3>
+        <p><strong>Dato:</strong> ${escapeHtml(event.dateLabel || event.date)}</p>
+        ${event.description ? `<p>${escapeHtml(event.description)}</p>` : ''}
+        <div class="calendar-attendees">Tilmeldte: ${escapeHtml((event.attendees || []).join(', ') || 'Ingen endnu')}</div>
+        <div class="calendar-signup">
+          <input class="calendar-name-input" data-event-id="${event.id}" placeholder="Dit navn">
+          <button type="button" class="calendar-signup-btn" data-event-id="${event.id}">Tilmeld mig</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('citaterForm');
     const input = document.getElementById('citaterInput');
+    const monthSelect = document.getElementById('madklubMonth');
+    const addPersonBtn = document.getElementById('addPersonBtn');
+    const addDateBtn = document.getElementById('addDateBtn');
+    const table = document.getElementById('madklubTable');
+    const calendarMonthSelect = document.getElementById('calendarMonthSelect');
+    const calendarAddBtn = document.getElementById('calendarAddBtn');
+    const calendarTitleInput = document.getElementById('calendarTitleInput');
+    const calendarDateInput = document.getElementById('calendarDateInput');
+    const calendarDescriptionInput = document.getElementById('calendarDescriptionInput');
+    const calendarEvents = document.getElementById('calendarEvents');
 
     renderEntries();
+    renderMadklubTable();
+    renderCalendarEvents();
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -437,6 +835,118 @@
       renderEntries();
       input.value = '';
     });
+
+    if (monthSelect) {
+      monthSelect.addEventListener('change', () => {
+        const state = getMadklubState();
+        state.month = monthSelect.value;
+        state.dates = state.dates.map((date, index) => ({ ...date, label: formatDateLabel(index + 1, state.month) }));
+        saveMadklubState(state);
+        renderMadklubTable();
+      });
+    }
+
+    if (addPersonBtn) {
+      addPersonBtn.addEventListener('click', () => {
+        const state = getMadklubState();
+        state.people.push({ name: '', values: Array(state.dates.length).fill('') });
+        saveMadklubState(state);
+        renderMadklubTable();
+      });
+    }
+
+    if (addDateBtn) {
+      addDateBtn.addEventListener('click', () => {
+        const state = getMadklubState();
+        const nextDay = state.dates.length + 1;
+        state.dates.push({ label: formatDateLabel(nextDay, state.month) });
+        state.people.forEach(person => {
+          person.values = person.values || [];
+          person.values.push('');
+        });
+        saveMadklubState(state);
+        renderMadklubTable();
+      });
+    }
+
+    if (table) {
+      table.addEventListener('input', (event) => {
+        if (event.target.classList.contains('madklub-name-input') || event.target.classList.contains('madklub-value-input')) {
+          updateMadklubFromInput(event.target);
+        }
+      });
+    }
+
+    if (calendarMonthSelect) {
+      calendarMonthSelect.addEventListener('change', () => {
+        const state = getCalendarState();
+        state.month = calendarMonthSelect.value;
+        saveCalendarState(state);
+        renderCalendarEvents();
+      });
+    }
+
+    if (calendarAddBtn) {
+      calendarAddBtn.addEventListener('click', () => {
+        const state = getCalendarState();
+        const title = calendarTitleInput.value.trim();
+        const dateValue = calendarDateInput.value;
+        const description = calendarDescriptionInput.value.trim();
+
+        if (!title || !dateValue) {
+          return;
+        }
+
+        const date = new Date(`${dateValue}T12:00:00`);
+        const monthName = getMonthNames()[date.getMonth()] || state.month;
+        const dateLabel = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+        state.events.push({
+          id: `${Date.now()}`,
+          title,
+          date: dateValue,
+          dateLabel,
+          month: monthName,
+          description,
+          attendees: []
+        });
+
+        saveCalendarState(state);
+        renderCalendarEvents();
+        calendarTitleInput.value = '';
+        calendarDescriptionInput.value = '';
+      });
+    }
+
+    if (calendarEvents) {
+      calendarEvents.addEventListener('click', (event) => {
+        const button = event.target.closest('.calendar-signup-btn');
+        if (!button) {
+          return;
+        }
+
+        const state = getCalendarState();
+        const eventId = button.dataset.eventId;
+        const input = calendarEvents.querySelector(`.calendar-name-input[data-event-id="${eventId}"]`);
+        const name = input ? input.value.trim() : '';
+
+        if (!name) {
+          return;
+        }
+
+        const calendarEvent = state.events.find(item => item.id === eventId);
+        if (!calendarEvent) {
+          return;
+        }
+
+        if (!calendarEvent.attendees.includes(name)) {
+          calendarEvent.attendees.push(name);
+        }
+
+        saveCalendarState(state);
+        renderCalendarEvents();
+      });
+    }
   });
 </script>
 
